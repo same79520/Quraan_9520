@@ -52,6 +52,22 @@
         audio::-webkit-media-controls-panel { background-color: #fdfbf7; }
         audio::-webkit-media-controls-play-button,
         audio::-webkit-media-controls-mute-button { background-color: rgba(25, 107, 70, 0.1); border-radius: 50%; }
+
+        /* تنسيق سكرول بار للقائمة المنسدلة */
+        #customRecitersList::-webkit-scrollbar {
+            width: 8px;
+        }
+        #customRecitersList::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 8px;
+        }
+        #customRecitersList::-webkit-scrollbar-thumb {
+            background: #196b46;
+            border-radius: 8px;
+        }
+        #customRecitersList::-webkit-scrollbar-thumb:hover {
+            background: #124d32;
+        }
     </style>
 </head>
 <body class="text-gray-800 antialiased min-h-screen flex flex-col">
@@ -82,11 +98,15 @@
                 <!-- منطقة اختيار القارئ والرواية والسورة -->
                 <div class="space-y-6">
                     
-                    <!-- 1. البحث عن القارئ -->
-                    <div>
+                    <!-- 1. البحث عن القارئ (تم تعديلها لقائمة منسدلة مخصصة) -->
+                    <div class="relative">
                         <label for="reciterInput" class="block text-gray-700 font-bold mb-2 text-lg">ابحث عن القارئ:</label>
-                        <input type="text" id="reciterInput" list="recitersList" placeholder="اكتب اسم القارئ هنا للبحث..." class="w-full border border-gray-300 rounded-xl px-4 py-3 bg-white text-gray-700 text-lg focus:outline-none focus:ring-2 focus:ring-islamic-green focus:border-transparent transition">
-                        <datalist id="recitersList"></datalist>
+                        <input type="text" id="reciterInput" autocomplete="off" placeholder="اكتب اسم القارئ هنا للبحث..." class="w-full border border-gray-300 rounded-xl px-4 py-3 bg-white text-gray-700 text-lg focus:outline-none focus:ring-2 focus:ring-islamic-green focus:border-transparent transition relative z-20">
+                        
+                        <!-- القائمة المنسدلة المخصصة -->
+                        <ul id="customRecitersList" class="absolute z-30 w-full bg-white border border-gray-200 rounded-xl shadow-2xl max-h-64 overflow-y-auto hidden mt-1 divide-y divide-gray-100">
+                            <!-- سيتم إضافة القراء هنا بواسطة الجافاسكربت -->
+                        </ul>
                     </div>
 
                     <!-- 2. اختيار الرواية -->
@@ -117,10 +137,10 @@
                 
                 <!-- أزرار التحميل -->
                 <div class="mt-6 flex flex-col sm:flex-row gap-4 justify-center">
-                    <a id="downloadSurahBtn" href="#" target="_blank" download class="hidden items-center justify-center gap-2 bg-islamic-green hover:bg-green-700 text-white font-bold py-3 px-6 rounded-xl shadow-md transition-transform transform hover:scale-105">
+                    <button id="downloadSurahBtn" type="button" class="hidden items-center justify-center gap-2 bg-islamic-green hover:bg-green-700 text-white font-bold py-3 px-6 rounded-xl shadow-md transition-transform transform hover:scale-105">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                         تحميل السورة
-                    </a>
+                    </button>
                     
                     <button id="downloadFullBtn" type="button" class="hidden items-center justify-center gap-2 bg-islamic-gold hover:bg-yellow-600 text-white font-bold py-3 px-6 rounded-xl shadow-md transition-transform transform hover:scale-105">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
@@ -164,7 +184,7 @@
     <!-- برمجة الموقع لدمج القراء، الروايات، والبحث -->
     <script>
         const reciterInput = document.getElementById('reciterInput');
-        const recitersList = document.getElementById('recitersList');
+        const customRecitersList = document.getElementById('customRecitersList');
         const moshafSelect = document.getElementById('moshafSelect');
         const surahSelect = document.getElementById('surahSelect');
         
@@ -188,12 +208,6 @@
                 allReciters = data.reciters;
                 allReciters.sort((a, b) => a.name.localeCompare(b.name, 'ar'));
 
-                allReciters.forEach(reciter => {
-                    const option = document.createElement('option');
-                    option.value = reciter.name;
-                    recitersList.appendChild(option);
-                });
-
             } catch (error) {
                 console.error("خطأ في جلب البيانات:", error);
                 reciterInput.placeholder = "عذراً، حدث خطأ في تحميل البيانات.";
@@ -201,15 +215,92 @@
             }
         }
 
-        // 1. عند البحث واختيار القارئ
-        reciterInput.addEventListener('input', function(e) {
-            const selectedName = e.target.value;
-            currentReciter = allReciters.find(r => r.name === selectedName);
+        // عرض قائمة القراء المخصصة
+        function renderReciters(list) {
+            customRecitersList.innerHTML = '';
+            
+            if (list.length === 0) {
+                const li = document.createElement('li');
+                li.className = 'p-4 text-gray-500 text-center font-medium';
+                li.textContent = 'لا يوجد قارئ بهذا الاسم';
+                customRecitersList.appendChild(li);
+                customRecitersList.classList.remove('hidden');
+                return;
+            }
 
-            moshafSelect.innerHTML = '<option value="">اختر الرواية...</option>';
+            list.forEach(reciter => {
+                const li = document.createElement('li');
+                li.className = 'p-3 px-5 cursor-pointer hover:bg-emerald-50 hover:text-islamic-green transition-colors duration-150 text-gray-700 font-medium';
+                li.textContent = reciter.name;
+                
+                // عند الضغط على اسم قارئ من القائمة
+                li.addEventListener('click', () => {
+                    reciterInput.value = reciter.name;
+                    customRecitersList.classList.add('hidden');
+                    handleReciterSelection(reciter);
+                });
+                
+                customRecitersList.appendChild(li);
+            });
+            
+            customRecitersList.classList.remove('hidden');
+        }
+
+        // إغلاق القائمة المنسدلة عند الضغط في أي مكان خارجها
+        document.addEventListener('click', function(e) {
+            if (!reciterInput.contains(e.target) && !customRecitersList.contains(e.target)) {
+                customRecitersList.classList.add('hidden');
+            }
+        });
+
+        // إظهار القائمة عند التركيز على حقل الإدخال
+        reciterInput.addEventListener('focus', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+            const filteredReciters = allReciters.filter(r => r.name.toLowerCase().includes(searchTerm));
+            renderReciters(filteredReciters);
+        });
+
+        // 1. عند البحث وكتابة الأحرف
+        reciterInput.addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase().trim();
+            const filteredReciters = allReciters.filter(r => r.name.toLowerCase().includes(searchTerm));
+            renderReciters(filteredReciters);
+
+            // تصفير القوائم الأخرى إذا تغير النص ولم يتم اختيار قارئ بعد
+            if(currentReciter && currentReciter.name !== e.target.value) {
+                resetSelections();
+            }
+        });
+
+        // دالة تصفير القوائم
+        function resetSelections() {
+            currentReciter = null;
+            selectedMoshafData = null;
+
+            moshafSelect.innerHTML = '<option value="">أولاً، الرجاء اختيار القارئ من الأعلى</option>';
             moshafSelect.disabled = true;
             moshafSelect.classList.add('bg-gray-50', 'cursor-not-allowed');
             moshafSelect.classList.remove('bg-white');
+            
+            surahSelect.innerHTML = '<option value="">أولاً، الرجاء اختيار الرواية</option>';
+            surahSelect.disabled = true;
+            surahSelect.classList.add('bg-gray-50', 'cursor-not-allowed');
+            surahSelect.classList.remove('bg-white');
+            
+            audioPlayer.pause();
+            statusMessage.textContent = "";
+            downloadSurahBtn.classList.add('hidden');
+            downloadSurahBtn.classList.remove('flex');
+            downloadFullBtn.classList.add('hidden');
+            downloadFullBtn.classList.remove('flex');
+        }
+
+        // دالة معالجة اختيار القارئ
+        function handleReciterSelection(selectedReciter) {
+            currentReciter = selectedReciter;
+
+            moshafSelect.innerHTML = '<option value="">اختر الرواية...</option>';
+            moshafSelect.disabled = true;
             
             surahSelect.innerHTML = '<option value="">أولاً، الرجاء اختيار الرواية</option>';
             surahSelect.disabled = true;
@@ -235,7 +326,7 @@
                 moshafSelect.classList.remove('bg-gray-50', 'cursor-not-allowed');
                 moshafSelect.classList.add('bg-white');
             }
-        });
+        }
 
         // 2. عند اختيار الرواية
         moshafSelect.addEventListener('change', function(e) {
@@ -277,43 +368,118 @@
             surahSelect.classList.add('bg-white');
         });
 
-        // 3. عند الضغط على زر "تحميل المصحف كاملاً" (تحميل السور تباعاً بضغطة واحدة)
-        downloadFullBtn.addEventListener('click', function() {
+        // دالة لجلب الملف في الخلفية وتحميله مباشرة بدون فتح أي صفحة جديدة
+        const downloadDirectly = async (url, fileName) => {
+            try {
+                const response = await fetch(url);
+                const blob = await response.blob();
+                const blobUrl = window.URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = blobUrl;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                
+                // تنظيف الذاكرة بعد التحميل
+                window.URL.revokeObjectURL(blobUrl);
+                document.body.removeChild(a);
+            } catch (err) {
+                // كخيار بديل في حال حدوث مشكلة تقنية نادرة في جلب الملف
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = fileName;
+                a.target = '_blank';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            }
+        };
+
+        // 3. عند الضغط على زر "تحميل المصحف كاملاً" (تحميل متتالي ومباشر بدون فتح نوافذ)
+        downloadFullBtn.addEventListener('click', async function() {
             if (!selectedMoshafData) return;
+            
+            // منع الضغط المتكرر أثناء عملية التحميل
+            if (downloadFullBtn.disabled) return;
 
-            const surahs = selectedMoshafData.surah_list.split(',');
-            statusMessage.textContent = "جاري بدء تحميل سور المصحف كاملاً...";
+            const surahs = selectedMoshafData.surah_list.split(',').filter(s => s);
+            if (surahs.length === 0) return;
 
-            surahs.forEach((surahNum, index) => {
-                if (!surahNum) return;
+            // تغيير حالة الزر ليظهر للمستخدم أن التحميل قيد التنفيذ
+            downloadFullBtn.disabled = true;
+            downloadFullBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            downloadFullBtn.innerHTML = `
+                <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                جاري التحميل...
+            `;
+
+            for (let i = 0; i < surahs.length; i++) {
+                const surahNum = surahs[i];
                 const paddedSurahNum = String(surahNum).padStart(3, '0');
                 const fileUrl = `${selectedMoshafData.server}${paddedSurahNum}.mp3`;
+                const surahName = surahNames[parseInt(surahNum) - 1];
                 
-                // استخدام نافذة خفية مؤقتة لتحميل كل سورة لتجنب حظر المتصفح للتحميلات المتعددة
-                setTimeout(() => {
-                    const a = document.createElement('a');
-                    a.href = fileUrl;
-                    a.download = `${paddedSurahNum}.mp3`;
-                    a.target = '_blank';
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                }, index * 400); // فاصل زمني بسيط بين كل سورة وأخرى لضمان استقرار التحميل
-            });
+                // تحديث حالة الرسالة للمستخدم
+                statusMessage.innerHTML = `<span class="text-islamic-gold font-bold">الرجاء عدم إغلاق الصفحة..</span><br>جاري تحميل سورة ${surahName} (${i + 1} من ${surahs.length})`;
+                
+                // تحميل السورة الحالية والانتظار حتى يكتمل قبل الانتقال للتي تليها
+                await downloadDirectly(fileUrl, `${paddedSurahNum} - سورة ${surahName}.mp3`);
+                
+                // استراحة قصيرة جداً (ثانية واحدة) بين كل ملف وآخر لتجنب الضغط الزائد على المتصفح
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
 
-            setTimeout(() => {
-                statusMessage.textContent = "تم إرسال طلبات تحميل المصحف كاملاً بنجاح!";
-            }, 1000);
+            // بعد انتهاء الحلقة
+            statusMessage.textContent = "تم الانتهاء من تحميل سور المصحف كاملاً بنجاح! ✅";
+            
+            // إعادة الزر لشكله الطبيعي
+            downloadFullBtn.disabled = false;
+            downloadFullBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            downloadFullBtn.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                تحميل المصحف كاملاً
+            `;
         });
 
-        // 4. عند اختيار السورة
+        // 4. عند الضغط على زر "تحميل السورة" (مباشر بدون فتح نوافذ)
+        downloadSurahBtn.addEventListener('click', async function(e) {
+            e.preventDefault();
+            const audioUrl = surahSelect.value;
+            if (!audioUrl || downloadSurahBtn.disabled) return;
+
+            const surahNameText = surahSelect.options[surahSelect.selectedIndex].text;
+            
+            // استخراج رقم السورة واسم الملف
+            const urlParts = audioUrl.split('/');
+            const originalFileName = urlParts[urlParts.length - 1]; 
+            const fileName = `${originalFileName.replace('.mp3', '')} - ${surahNameText}.mp3`;
+
+            // تغيير شكل الزر لإظهار حالة التحميل
+            const originalContent = downloadSurahBtn.innerHTML;
+            downloadSurahBtn.disabled = true;
+            downloadSurahBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            downloadSurahBtn.innerHTML = `
+                <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                جاري...
+            `;
+
+            await downloadDirectly(audioUrl, fileName);
+
+            // استعادة شكل الزر
+            downloadSurahBtn.disabled = false;
+            downloadSurahBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            downloadSurahBtn.innerHTML = originalContent;
+        });
+
+        // 5. عند اختيار السورة
         surahSelect.addEventListener('change', function(e) {
             const audioUrl = e.target.value;
             if (audioUrl) {
                 statusMessage.textContent = "جاري التشغيل...";
                 audioPlayer.src = audioUrl;
                 
-                downloadSurahBtn.href = audioUrl;
                 downloadSurahBtn.classList.remove('hidden');
                 downloadSurahBtn.classList.add('flex');
 
