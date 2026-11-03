@@ -88,7 +88,7 @@
                 <!-- منطقة اختيار القارئ والرواية والسورة -->
                 <div class="space-y-6">
                     
-                    <!-- 1. البحث عن القارئ (تم تحديثه ليكون قائمة منسدلة مخصصة) -->
+                    <!-- 1. البحث عن القارئ -->
                     <div class="relative">
                         <label for="reciterSearch" class="block text-gray-700 font-bold mb-2 text-lg">ابحث عن القارئ:</label>
                         <input type="text" id="reciterSearch" autocomplete="off" placeholder="اكتب اسم القارئ هنا للبحث..." class="w-full border border-gray-300 rounded-xl px-4 py-3 bg-white text-gray-700 text-lg focus:outline-none focus:ring-2 focus:ring-islamic-green focus:border-transparent transition">
@@ -115,8 +115,8 @@
 
                 <!-- قسم البث المباشر للإذاعات -->
                 <div class="mt-8 mb-8 pt-6 border-t border-gray-200">
-                    <h3 class="text-xl font-bold text-islamic-green mb-4 font-amiri text-center">📻 البث المباشر لإذاعات القرآن الكريم</h3>
-                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <h3 class="text-xl font-bold text-islamic-green mb-4 font-amiri text-center">📻 البث المباشر لإذاعة القرآن الكريم</h3>
+                    <div class="flex justify-center">
                         <button id="egyptRadioBtn" type="button" class="flex items-center justify-center gap-2 bg-white border-2 border-islamic-green text-islamic-green hover:bg-islamic-green hover:text-white font-bold py-3 px-6 rounded-xl shadow-sm transition-all duration-300">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"></circle><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"></path></svg>
                             إذاعة القرآن الكريم (مصر)
@@ -133,7 +133,7 @@
                 
                 <div id="statusMessage" class="text-center mt-3 text-islamic-green font-bold min-h-[1.5rem]"></div>
                 
-                <!-- أزرار التحميل (تم تحويلها لـ Buttons لتعمل بتقنية Fetch) -->
+                <!-- أزرار التحميل المباشر للسور -->
                 <div class="mt-6 flex flex-col sm:flex-row gap-4 justify-center">
                     <button id="downloadSurahBtn" type="button" class="hidden items-center justify-center gap-2 bg-islamic-green hover:bg-green-700 text-white font-bold py-3 px-6 rounded-xl shadow-md transition-transform transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
@@ -146,10 +146,16 @@
                     </button>
                 </div>
 
-                <div class="mt-10 text-center">
-                    <a href="https://t.me/Quraan_9520" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 bg-[#0088cc] hover:bg-[#0077b5] text-white font-bold py-3 px-8 rounded-full shadow-lg transition-transform transform hover:scale-105">
+                <!-- أزرار تحميل التطبيق والتليجرام -->
+                <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center items-center">
+                    <a href="https://drive.google.com/uc?export=download&id=1RzQhfKdbOsJEPOl8-zpxevjh2Jq4vRQy" class="inline-flex items-center justify-center gap-2 bg-islamic-dark hover:bg-gray-800 text-white font-bold py-3 px-6 rounded-full shadow-lg transition-transform transform hover:scale-105 w-full sm:w-auto">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        تحميل التطبيق (APK)
+                    </a>
+
+                    <a href="https://t.me/Quraan_9520" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 bg-[#0088cc] hover:bg-[#0077b5] text-white font-bold py-3 px-6 rounded-full shadow-lg transition-transform transform hover:scale-105 w-full sm:w-auto">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-                        اشترك في قناة التليجرام: أجر دائم ❤️
+                        قناة التليجرام
                     </a>
                 </div>
             </div>
@@ -161,7 +167,7 @@
                     <p>أنا شخص مجهول لكم، وقد لا تعرفون اسمي، لكن إن جاء يوم وتوقفت فيه عن النشر، فلا تنسوني من دعوة صادقة بظهر الغيب: <br>
                     <span class="font-bold">أن يجعل الله ما قُدِّم هنا في ميزان حسناتي وأن تكون هذه القناة وهذا الموقع صدقة جارية لي ولوالداي وللمؤمنين جميعا الاحياء منهم والأموات</span></p>
                     <p>والله ما سعيت إلا للخير، فإن وُفِّقت، فبفضل الله ❤️</p>
-                    <p>فساعدونا بنشر القناة ولينك الموقع في جروباتكم وحساباتكم الخاصة لكي ينضم إليها الجميع <br>
+                    <p>فساعدونا بنشر القناة ولينك الموقع والتطبيق في جروباتكم وحساباتكم الخاصة لكي ينضم إليها الجميع <br>
                     <span class="text-islamic-gold font-bold">واعلموا :</span><br>
                     انه سنرحل ويبقى الأثر ويبقي الأجر الدائم والصدقة الجارية وما أجمل ان تكون الصدقة كتاب الله 😍</p>
                     <p>بارك اللَّه فيكم وجعلها في ميزان حسناتكم وفي ميزان حسنات من يسمع او يشارك ما في القناة او الموقع ❤️</p>
@@ -179,7 +185,6 @@
         <p>صدقة جارية ❤️ | أجر دائم</p>
     </footer>
 
-    <!-- برمجة الموقع لدمج القراء، الروايات، البحث المخصص، والتحميل المباشر -->
     <script>
         const reciterSearch = document.getElementById('reciterSearch');
         const customDropdown = document.getElementById('customDropdown');
@@ -217,7 +222,6 @@
             }
         }
 
-        // --- دوال القائمة المنسدلة المخصصة ---
         function renderDropdown(list) {
             customDropdown.innerHTML = '';
             if (list.length === 0) {
@@ -255,7 +259,6 @@
             }
         });
 
-        // عند اختيار قارئ من القائمة
         function selectReciter(reciter) {
             reciterSearch.value = reciter.name;
             currentReciter = reciter;
@@ -292,7 +295,6 @@
             }
         }
 
-        // عند اختيار الرواية
         moshafSelect.addEventListener('change', function(e) {
             const moshafIndex = e.target.value;
             
@@ -332,7 +334,6 @@
             surahSelect.classList.add('bg-white');
         });
 
-        // عند اختيار السورة
         surahSelect.addEventListener('change', function(e) {
             currentAudioUrl = e.target.value;
             if (currentAudioUrl) {
@@ -362,7 +363,6 @@
             }
         });
 
-        // --- دالة التحميل المباشر المخفية (Fetch & Blob) ---
         async function fetchAndDownload(url, filename) {
             try {
                 const response = await fetch(url);
@@ -384,7 +384,6 @@
             }
         }
 
-        // زر تحميل السورة الواحدة
         downloadSurahBtn.addEventListener('click', async function() {
             if (!currentAudioUrl || !currentSurahNum) return;
             
@@ -404,7 +403,6 @@
             downloadSurahBtn.disabled = false;
         });
 
-        // زر تحميل المصحف كاملاً
         downloadFullBtn.addEventListener('click', async function() {
             if (!selectedMoshafData) return;
 
@@ -433,7 +431,6 @@
             downloadSurahBtn.disabled = false;
         });
 
-        // --- برمجة الإذاعات المباشرة ---
         function playRadioStream(url, radioName) {
             statusMessage.textContent = "جاري الاتصال بالبث المباشر...";
             audioPlayer.src = url;
@@ -454,7 +451,6 @@
 
         egyptRadioBtn.addEventListener('click', () => playRadioStream(egyptStreamUrl, "إذاعة القرآن الكريم من القاهرة"));
 
-        // تشغيل التهيئة
         init();
     </script>
 </body>
