@@ -209,11 +209,183 @@
         let currentSurahNum = "";
 
         // جلب البيانات من الـ API
+        // ===== دمج مصدر إضافي (QuranicAudio) مع mp3quran =====
+        // أسماء عربية بديلة لعناصر مصدرها بلا اسم عربي + توجيه مطابقة يدوي للحالات الحدّية
+        const QA_OVERRIDES = {
+            3: { match: 'شيخ أبو بكر الشاطري' },
+            5: { match: 'مشاري العفاسي' },
+            8: { match: 'علي بن عبدالرحمن الحذيفي' },
+            18: { match: 'صلاح بو خاطر' },
+            21: { match: 'عبدالعزيز الأحمد' },
+            23: { match: 'توفيق الصايغ' },
+            24: { match: 'علي جابر' },
+            43: { match: 'صلاح البدير' },
+            51: { match: 'ماهر المعيقلي' },
+            52: { match: 'ماهر المعيقلي' },
+            55: { match: 'الحسيني العزازي' },
+            56: { match: 'إبراهيم الجبرين' },
+            69: { match: 'علي جابر' },
+            71: { match: 'مصطفى رعد العزاوي' },
+            78: { match: 'محمود خليل الحصري' },
+            80: { match: 'صلاح الهاشم' },
+            85: { match: 'حاتم فريد الواعر' },
+            86: { match: 'حاتم فريد الواعر' },
+            87: { match: 'حاتم فريد الواعر' },
+            95: { match: 'مشاري العفاسي' },
+            96: { match: 'حاتم فريد الواعر' },
+            139: { match: 'حاتم فريد الواعر' },
+            141: { match: 'محمود خليل الحصري' },
+            142: { match: 'محمود خليل الحصري' },
+            155: { match: 'نورين محمد صديق' },
+            158: { match: 'علي جابر' },
+            81: { ar: 'عادل الكلباني', match: 'عادل الكلباني' },
+            97: { ar: 'ياسر الدوسري', match: 'ياسر الدوسري' },
+            103: { ar: 'إبراهيم الأخضر', match: 'إبراهيم الأخضر' },
+            104: { ar: 'ناصر القطامي', match: 'ناصر القطامي' },
+            105: { ar: 'خالد الغامدي', match: 'خالد الغامدي' },
+            106: { ar: 'عبدالكريم الحازمي', match: 'عبدالكريم الحازمي' },
+            109: { ar: 'عبدالرشيد صوفي', match: 'عبدالرشيد صوفي' },
+            113: { ar: 'أحمد الحذيفي', match: 'أحمد الحذيفي' },
+            116: { ar: 'إدريس أبكر', match: 'إدريس أبكر' },
+            117: { ar: 'بندر بليله', match: 'بندر بليله' },
+            122: { ar: 'محمود خليل الحصري', match: 'محمود خليل الحصري' },
+            124: { ar: 'عبدالله المطرود', match: 'عبدالله المطرود' },
+            126: { ar: 'أحمد نعينع', match: 'أحمد نعينع' },
+            128: { ar: 'علي حجاج السويسي', match: 'علي حجاج السويسي' },
+            136: { ar: 'عبدالله عبدل', match: 'عبدالله عبدل' },
+            160: { ar: 'بندر بليله', match: 'بندر بليله' },
+            161: { ar: 'خليفة الطنيجي', match: 'خليفة الطنيجي' },
+            162: { ar: 'عبدالرحمن الشحات', match: 'عبدالرحمن الشحات' },
+            164: { ar: 'محمود خليل الحصري', match: 'محمود خليل الحصري' },
+            167: { ar: 'بدر التركي', match: 'بدر التركي' },
+            168: { ar: 'رعد محمد الكردي', match: 'رعد محمد الكردي' },
+            107: { ar: 'محمد أيوب', match: 'محمد أيوب' },
+            110: { ar: 'عبدالرشيد صوفي', match: 'عبدالرشيد صوفي' },
+            111: { ar: 'عبدالرشيد صوفي', match: 'عبدالرشيد صوفي' },
+            112: { ar: 'عبدالرشيد صوفي', match: 'عبدالرشيد صوفي' },
+            114: { ar: 'علي بن عبدالرحمن الحذيفي', match: 'علي بن عبدالرحمن الحذيفي' },
+            115: { ar: 'شيخ أبو بكر الشاطري', match: 'شيخ أبو بكر الشاطري' },
+            119: { ar: 'محمد خليل القارئ', match: 'محمد خليل القارئ' },
+            121: { ar: 'محمد المحيسني', match: 'محمد المحيسني' },
+            125: { ar: 'عبدالودود حنيف', match: 'عبدالودود حنيف' },
+            130: { ar: 'وديع اليمني', match: 'وديع اليمني' },
+            138: { ar: 'عادل الكلباني', match: 'عادل الكلباني' },
+            163: { ar: 'عبدالعزيز الزهراني', match: 'عبدالعزيز الزهراني' },
+            166: { ar: 'عليجان قوري حمدان', match: 'عليجان قوري حمدان' },
+            169: { ar: 'بيشه وا قادر الكردي', match: 'بيشه وا قادر الكردي' },
+            90: { ar: 'محمد سليمان باتل' },
+            92: { ar: 'محمد إسماعيل المقدم' },
+            108: { ar: 'عبد المنعم عبد المبدئ' },
+            135: { ar: 'عاصم عبد العليم' },
+            170: { ar: 'فرمان شاواني' },
+            181: { ar: 'أحمد طاحون' },
+            82: { ar: 'تراويح مكة ١٤٣٠' },
+            84: { ar: 'تراويح المدينة ١٤٣١' },
+            98: { ar: 'تراويح مكة ١٤٣٣' },
+            99: { ar: 'تراويح المدينة ١٤٢٩' },
+            100: { ar: 'تراويح المدينة ١٤٣٠' },
+            101: { ar: 'تراويح المدينة ١٤٣٢' },
+            102: { ar: 'تراويح المدينة ١٤٣٣' },
+            118: { ar: 'تراويح مسجد قباء ١٤٣٤' },
+            171: { ar: 'تراويح المدينة ١٤٤٣' },
+            172: { ar: 'تراويح المدينة ١٤٤٤' },
+            173: { ar: 'تراويح المدينة ١٤٤٥' },
+            174: { ar: 'تراويح المدينة ١٤٤٦' },
+            175: { ar: 'تراويح مكة ١٤٤٣' },
+            176: { ar: 'تراويح مكة ١٤٤٤' },
+            177: { ar: 'تراويح مكة ١٤٤٥' },
+            178: { ar: 'تراويح مكة ١٤٤٦' },
+            179: { ar: 'تراويح مكة ١٤٤٧' },
+            180: { ar: 'تراويح المدينة ١٤٤٧' },
+            83: { ar: 'تراويح مكة ١٤٣١' },
+            94: { ar: 'تراويح مكة ١٤٣٢' },
+            149: { ar: 'تراويح المدينة ١٤٤٢' }
+        };
+        // عناصر مستبعدة يدوياً (وصف المصدر نفسه يقول إنها غير مكتملة)
+        const QA_EXCLUDE_IDS = { 140: true };
+
+        // مفتاح مطابقة متسامح: يوحد الحروف ويزيل المسافات والألقاب واللواحق الوصفية
+        function normalizeArabicName(name) {
+            return (name || '')
+                .replace(/[ً-ْٰـ]/g, '')
+                .replace(/[إأآ]/g, 'ا')
+                .replace(/ة/g, 'ه')
+                .replace(/ى/g, 'ي')
+                .replace(/ؤ/g, 'و')
+                .replace(/ئ/g, 'ي')
+                .replace(/\([^)]*\)/g, ' ')
+                .replace(/\[[^\]]*\]/g, ' ')
+                .replace(/\s*[-–]\s*.*$/, '')
+                .replace(/^(الشيخ|شيخ|الدكتور|د)\.?\s+/, '')
+                .replace(/\s+/g, '')
+                .toLowerCase();
+        }
+
+        function qaMoshafLabel(q, displayName) {
+            const hay = ((q.name || '') + ' ' + (displayName || '')).toLowerCase();
+            if (q.section_id === 2 || /taraweeh|تراويح/.test(hay)) return 'تلاوات تراويح (مصدر إضافي)';
+            if (/مجود|mujawwad/.test(hay)) return 'مجود (مصدر إضافي)';
+            if (/ورش|warsh/.test(hay)) return 'ورش عن نافع (مصدر إضافي)';
+            if (/دوري|doori/.test(hay)) return 'الدوري عن أبي عمرو (مصدر إضافي)';
+            if (/سوسي|soosi/.test(hay)) return 'السوسي عن أبي عمرو (مصدر إضافي)';
+            if (/خلف|khalaf/.test(hay)) return 'خلف عن حمزة (مصدر إضافي)';
+            if (/قالون|qaloon/.test(hay)) return 'قالون عن نافع (مصدر إضافي)';
+            if (/معلم|muallim|اطفال|kids/.test(hay)) return 'مصحف معلم (مصدر إضافي)';
+            return 'مرتل (مصدر إضافي)';
+        }
+
+        // دمج قرّاء ومصاحف إضافية من QuranicAudio بجانب mp3quran
+        // أي فشل هنا لا يؤثر على الموقع: يبقى يعمل بالمصدر الأساسي فقط
+        async function mergeQuranicAudio() {
+            try {
+                const res = await fetch('https://quranicaudio.com/api/qaris');
+                if (!res.ok) return;
+                const qaris = await res.json();
+                const fullSurahList = Array.from({ length: 114 }, (_, i) => i + 1).join(',');
+                const byName = new Map();
+                allReciters.forEach(r => byName.set(normalizeArabicName(r.name), r));
+                qaris.forEach(q => {
+                    if (!q.relative_path || QA_EXCLUDE_IDS[q.id]) return;
+                    if (q.section_id === 4) return; // ترجمات صوتية، ليست تلاوات عربية
+                    if (/\(Partial\)|غير مكتمل/.test((q.name || '') + ' ' + (q.arabic_name || ''))) return;
+                    const ov = QA_OVERRIDES[q.id] || {};
+                    const rawName = q.arabic_name || ov.ar;
+                    if (!rawName) return;
+                    const displayName = ov.ar || rawName.replace(/\s*[-–]\s*(مرتل|مجود)\s*$/, '');
+                    const moshaf = {
+                        name: qaMoshafLabel(q, rawName),
+                        server: 'https://download.quranicaudio.com/quran/' + q.relative_path.replace(/\/?$/, '/'),
+                        surah_total: 114,
+                        surah_list: fullSurahList
+                    };
+                    const key = normalizeArabicName(ov.match || rawName);
+                    const existing = byName.get(key);
+                    if (existing) {
+                        let label = moshaf.name;
+                        let n = 2;
+                        while (existing.moshaf.some(m => m.name === label)) {
+                            label = moshaf.name.replace(')', ' ' + n + ')');
+                            n++;
+                        }
+                        moshaf.name = label;
+                        existing.moshaf.push(moshaf);
+                    } else {
+                        const reciter = { name: displayName, moshaf: [moshaf] };
+                        allReciters.push(reciter);
+                        byName.set(key, reciter);
+                    }
+                });
+            } catch (e) {
+                console.warn('تعذر دمج المصدر الإضافي، يعمل الموقع بالمصدر الأساسي فقط.', e);
+            }
+        }
+
         async function init() {
             try {
                 const recitersRes = await fetch('https://mp3quran.net/api/v3/reciters?language=ar');
                 const data = await recitersRes.json();
                 allReciters = data.reciters;
+                await mergeQuranicAudio();
                 allReciters.sort((a, b) => a.name.localeCompare(b.name, 'ar'));
             } catch (error) {
                 console.error("خطأ في جلب البيانات:", error);
