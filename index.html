@@ -331,15 +331,15 @@
 
         function qaMoshafLabel(q, displayName) {
             const hay = ((q.name || '') + ' ' + (displayName || '')).toLowerCase();
-            if (q.section_id === 2 || /taraweeh|تراويح/.test(hay)) return 'تلاوات تراويح (مصدر إضافي)';
-            if (/مجود|mujawwad/.test(hay)) return 'مجود (مصدر إضافي)';
-            if (/ورش|warsh/.test(hay)) return 'ورش عن نافع (مصدر إضافي)';
-            if (/دوري|doori/.test(hay)) return 'الدوري عن أبي عمرو (مصدر إضافي)';
-            if (/سوسي|soosi/.test(hay)) return 'السوسي عن أبي عمرو (مصدر إضافي)';
-            if (/خلف|khalaf/.test(hay)) return 'خلف عن حمزة (مصدر إضافي)';
-            if (/قالون|qaloon/.test(hay)) return 'قالون عن نافع (مصدر إضافي)';
-            if (/معلم|muallim|اطفال|kids/.test(hay)) return 'مصحف معلم (مصدر إضافي)';
-            return 'مرتل (مصدر إضافي)';
+            if (q.section_id === 2 || /taraweeh|تراويح/.test(hay)) return 'تلاوات تراويح';
+            if (/مجود|mujawwad/.test(hay)) return 'حفص عن عاصم - مجود';
+            if (/ورش|warsh/.test(hay)) return 'ورش عن نافع - مرتل';
+            if (/دوري|doori/.test(hay)) return 'الدوري عن أبي عمرو - مرتل';
+            if (/سوسي|soosi/.test(hay)) return 'السوسي عن أبي عمرو - مرتل';
+            if (/خلف|khalaf/.test(hay)) return 'خلف عن حمزة - مرتل';
+            if (/قالون|qaloon/.test(hay)) return 'قالون عن نافع - مرتل';
+            if (/معلم|muallim|اطفال|kids/.test(hay)) return 'حفص عن عاصم - معلم';
+            return 'حفص عن عاصم - مرتل';
         }
 
         // دمج بيانات QuranicAudio المدمجة في الملف نفسه مع قرّاء mp3quran
@@ -364,7 +364,7 @@
                     let label = moshaf.name;
                     let n = 2;
                     while (existing.moshaf.some(m => m.name === label)) {
-                        label = moshaf.name.replace(')', ' ' + n + ')');
+                        label = moshaf.name + ' ' + n;
                         n++;
                     }
                     moshaf.name = label;
